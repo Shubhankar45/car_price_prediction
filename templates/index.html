@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Car Price Predictor</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#ff4d4d;
+    --secondary:#22d3ee;
+    --panel:#121826;
+    --card:#1b2236;
+    --border:#2a3350;
+    --text:#e5e7eb;
+    --muted:#9ca3af;
+}
+
+*{
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:radial-gradient(circle at top, #1f2937, #0b0f19);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text);
+}
+
+.app{
+    width:1200px;
+    max-width:96%;
+    height:700px;   /* 🔑 tuned */
+    background:var(--panel);
+    border-radius:26px;
+    display:grid;
+    grid-template-columns:1.2fr 1fr;
+    overflow:hidden;
+    box-shadow:0 40px 120px rgba(0,0,0,0.7);
+}
+
+/* LEFT */
+.left{
+    padding:42px;
+    background:
+        radial-gradient(circle at top right, rgba(255,77,77,.25), transparent 45%),
+        linear-gradient(135deg,#111827,#0b0f19);
+}
+
+.left h1{
+    font-size:38px;
+    font-weight:700;
+    margin-bottom:12px;
+    color:var(--primary);
+}
+
+.left p{
+    font-size:14.5px;
+    color:var(--muted);
+    line-height:1.6;
+    max-width:440px;
+}
+
+.hero{
+    display:block;
+    margin:24px auto 0;
+    height:460px;   /* 🔑 reduced */
+    max-width:100%;
+}
+
+/* RIGHT */
+.right{
+    padding:20px;
+    display:grid;
+    grid-template-rows:auto auto 1fr; /* 🔑 */
+    gap:10px;
+}
+
+/* FORM CARD */
+.card{
+    background:var(--card);
+    border-radius:18px;
+    padding:18px;   /* 🔑 reduced */
+    border:1px solid var(--border);
+}
+
+.card h2{
+    text-align:center;
+    margin-bottom:12px;
+    font-size:17px;
+}
+
+form{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+input,select{
+    padding:8px 10px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    background:#0f172a;
+    color:#f9fafb;
+    font-size:13px;
+}
+
+input::placeholder{
+    color:#9ca3af;
+}
+
+button{
+    grid-column:span 2;
+    padding:10px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--primary),#ff6b6b);
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* RESULT */
+.result{
+    background:linear-gradient(135deg,#0f766e,#022c22);
+    border-radius:14px;
+    padding:10px;
+    text-align:center;
+    border:1px solid #134e4a;
+}
+
+.price{
+    font-size:20px;
+    font-weight:700;
+    color:#5eead4;
+}
+
+/* SUMMARY */
+.summary{
+    background:#0f172a;
+    border-radius:14px;
+    padding:12px;
+    border:1px solid var(--border);
+}
+
+.summary h3{
+    font-size:13.5px;
+    margin-bottom:8px;
+}
+
+/* DETAILS GRID */
+.details-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.detail-item{
+    background:#020617;
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:6px 8px;
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+}
+
+.detail-label{
+    color:var(--muted);
+}
+
+.detail-value{
+    color:#e5e7eb;
+    font-weight:600;
+}
+
+/* MOBILE */
+@media(max-width:900px){
+    .app{
+        grid-template-columns:1fr;
+        height:auto;
+    }
+    .hero{
+        height:280px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+{% set fuel_map = {'0':'CNG','1':'Diesel','2':'Petrol'} %}
+{% set seller_map = {'0':'Dealer','1':'Individual'} %}
+{% set trans_map = {'0':'Automatic','1':'Manual'} %}
+{% set owner_map = {'0':'First','1':'Second','2':'Third'} %}
+
+<div class="app">
+
+    <!-- LEFT -->
+    <div class="left">
+        <h1>Car Price Predictor</h1>
+        <p>
+            Predict the resale value of your car using a machine-learning model
+            trained on real automobile market data.
+        </p>
+
+        <img class="hero"
+             src="{{ url_for('static', filename='images/car.png') }}"
+             alt="Car">
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+
+        <div class="card">
+            <h2>Enter Vehicle Details</h2>
+
+            <form method="POST" action="/predict">
+                <input type="number" name="Year" placeholder="Year" required>
+                <input type="number" step="0.1" name="Present_Price" placeholder="Price (Lakhs)" required>
+
+                <input type="number" name="Kms_Driven" placeholder="KMs Driven" required>
+
+                <select name="Fuel_Type" required>
+                    <option value="">Fuel</option>
+                    <option value="2">Petrol</option>
+                    <option value="1">Diesel</option>
+                    <option value="0">CNG</option>
+                </select>
+
+                <select name="Seller_Type" required>
+                    <option value="">Seller</option>
+                    <option value="0">Dealer</option>
+                    <option value="1">Individual</option>
+                </select>
+
+                <select name="Transmission" required>
+                    <option value="">Transmission</option>
+                    <option value="0">Automatic</option>
+                    <option value="1">Manual</option>
+                </select>
+
+                <input type="number" name="Owner" placeholder="Owner (0/1/2)" required>
+
+                <button type="submit">Predict Price</button>
+            </form>
+        </div>
+
+        {% if prediction %}
+        <div class="result">
+            <div class="price">₹ {{ prediction }} Lakhs</div>
+            <div>Estimated Resale Value</div>
+        </div>
+
+        <div class="summary">
+            <h3>Entered Details</h3>
+
+            <div class="details-grid">
+                <div class="detail-item"><span class="detail-label">Year</span><span class="detail-value">{{ request.form.Year }}</span></div>
+                <div class="detail-item"><span class="detail-label">Price</span><span class="detail-value">{{ request.form.Present_Price }} L</span></div>
+                <div class="detail-item"><span class="detail-label">KMs</span><span class="detail-value">{{ request.form.Kms_Driven }}</span></div>
+                <div class="detail-item"><span class="detail-label">Fuel</span><span class="detail-value">{{ fuel_map[request.form.Fuel_Type] }}</span></div>
+                <div class="detail-item"><span class="detail-label">Seller</span><span class="detail-value">{{ seller_map[request.form.Seller_Type] }}</span></div>
+                <div class="detail-item"><span class="detail-label">Transmission</span><span class="detail-value">{{ trans_map[request.form.Transmission] }}</span></div>
+                <div class="detail-item"><span class="detail-label">Owner</span><span class="detail-value">{{ owner_map[request.form.Owner] }}</span></div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+</body>
+</html>
